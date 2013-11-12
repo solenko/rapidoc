@@ -90,16 +90,16 @@ describe RoutesDoc do
 
   context "when we call get_resources_names function" do
     it "returns all resources name" do
-      @routes_doc.add_route( 'GET /users(.:format) users#index' )
-      @routes_doc.add_route( 'GET /images(.:format) images#index' )
+      @routes_doc.add_route({:name=>"", :verb=>"GET", :path=>"/users(.:format)", :reqs=>"users#index"})
+      @routes_doc.add_route({:name=>"", :verb=>"GET", :path=>"/images(.:format)", :reqs=>"images#index"})
       @routes_doc.get_resources_names.should == [ :images, :users ]
     end
   end
 
   context "when we call get_resource_actions_names function" do
     it "returns all actions names" do
-      @routes_doc.add_route( 'GET /users(.:format) users#index' )
-      @routes_doc.add_route( 'GET /users(.:format) users#show' )
+      @routes_doc.add_route({:name=>"", :verb=>"GET", :path=>"/users(.:format)", :reqs=>"users#index"})
+      @routes_doc.add_route({:name=>"", :verb=>"GET", :path=>"/users(.:format)", :reqs=>"users#show"})
       @routes_doc.get_resource_actions_names( :users ).should == [ 'index', 'show' ]
     end
   end
@@ -107,7 +107,7 @@ describe RoutesDoc do
   context "when we call add_route function" do
     context "when route has 3 normal elements" do
       before do
-        @route = 'GET /users(.:format) users#index'
+        @route = {:name=>"", :verb=>"GET", :path=>"/users(.:format)", :reqs=>"users#index"}
       end
 
       it "calls add_resource_route function with correct params" do
@@ -119,7 +119,7 @@ describe RoutesDoc do
 
     context "when route has 3 elements" do
       before do
-        @route = '/users/:id(.:format) users#index {:id=>/[A-Z]\d{5}/}'
+        @route = {:name=> nil, :verb=> nil, :path=>"/users/:id(.:format)", :reqs=>"users#index {:id=>/[A-Z]\d{5}/}"}
       end
 
       it "calls add_resource_route function with correct params" do

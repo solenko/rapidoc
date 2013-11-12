@@ -3,7 +3,7 @@ include Rapidoc
 namespace :rapidoc do
 
   desc "Generate the api documentation"
-  task :generate do
+  task :generate => :environment do
     load_config
     create_structure
     puts "Generating API documentation..."

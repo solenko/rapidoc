@@ -16,8 +16,9 @@ module Rapidoc
     #
     def initialize( resource_name, routes_actions_info )
       @name = resource_name.to_s
-      @controller_file = name.to_s.pluralize + '_controller' + controllers_extension
-
+      @actions_doc = []
+      @description = []
+      @extractors = {}
       generate_info routes_actions_info
     end
 
@@ -25,22 +26,25 @@ module Rapidoc
     # Names with '/' caracter produce problems in html ids
     #
     def simple_name
-      return self.name.delete '/'
+      self.name.parameterize
     end
 
     private
+
+    def controller_file_name(controller)
+      ActiveSupport::Dependencies.search_for_file("#{controller}_controller")
+    end
 
     ##
     # Create description and actions_doc
     #
     def generate_info( routes_info )
-      if routes_info
-        extractor = get_controller_extractor
-        @description = extractor.get_resource_info['description'] if extractor
-        @actions_doc =  get_actions_doc( routes_info, extractor )
+      routes_info.map {|i| i[:controller]}.uniq.each do |controller_name|
+        @description << controller_extractor(controller_name).description
+      end
 
-        # template need that description will be an array
-        @description = [ @description ] unless @description.class == Array
+      routes_info.each do |route|
+        @actions_doc << get_action_doc( route, controller_extractor(route[:controller]) )
       end
     end
 
@@ -48,22 +52,16 @@ module Rapidoc
     # @return [ControllerExtractor] extractor that allow read controller files
     # and extract action and resource info from them
     #
-    def get_controller_extractor
-      if File.exists? controller_dir( @controller_file )
-        ControllerExtractor.new @controller_file
-      else
-        nil
-      end
+    def controller_extractor(controller)
+      @extractors[controller] ||= ControllerExtractor.new(controller_file_name(controller))
     end
 
     ##
     # @return [Array] all the resource ActionDoc
     #
-    def get_actions_doc( routes_actions_info, extractor )
-      routes_actions_info.map do |route_info|
-        controller_info = extractor ? extractor.get_action_info( route_info[:action] ) : nil
-        ActionDoc.new( route_info, controller_info, examples_dir )
-      end
+    def get_action_doc(route_info, extractor )
+      controller_info = extractor.get_action_info( route_info[:action] )
+      ActionDoc.new( route_info, controller_info, examples_dir )
     end
   end
 end

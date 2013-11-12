@@ -11,22 +11,16 @@ module Rapidoc
     end
 
     def add_route( route )
-      if route.split.size > 3
-        method, url, controller_action = route.split.slice(1, 3)
-      elsif route.split.size == 2
-        url, controller_action = route.split
-      else
-        method, url, controller_action = route.split
-      end
-
-      # check when method is not specified
-      unless controller_action.include? '#'
-        controller_action = url
-        url = method
-        method = nil
-      end
-
-      add_resource_route( method, url, controller_action )
+      info = {
+          name:   route.name,
+          verb:   route.verb,
+          path:   route.path,
+          reqs:   route.reqs,
+          regexp: route.json_regexp,
+          controller: route.controller,
+          action: route.action
+      }
+      add_resource_route( info[:controller].classify, info)
     end
 
     def get_resources_names
@@ -49,20 +43,13 @@ module Rapidoc
       methods = []
 
       # compact and generate action info from all routes info of resource
-      @resources_routes[resource.to_sym].each do |route|
-        if route[:action] == action.to_s
-          urls.push route[:url]
-          controllers.push route[:controller]
-          methods.push route[:method]
-        end
-      end
-
+      action_route = @resources_routes[resource.to_sym].detect { |route| route[:action] == action.to_s }
       return {
         resource: resource.to_s,
         action: action.to_s,
-        method: methods.uniq.first,
-        urls: urls.uniq,
-        controllers: controllers.uniq
+        method: action_route[:method],
+        urls: action_route[:url],
+        controller: action_route[:controller]
       }
     end
 
@@ -71,20 +58,11 @@ module Rapidoc
     ##
     # Add new route info to resource routes array with correct format
     #
-    def add_resource_route( method, url, controller_action )
-      #resource = get_resource_name( url )
-      resource = controller_action.split('#').first
-      info =  {
-        resource: resource,
-        action: controller_action.split('#').last,
-        method: method,
-        url: url ,
-        controller: controller_action.split('#').first
-      }
-
+    def add_resource_route( resource, info)
       @resources_routes[resource.to_sym] ||= []
       @resources_routes[resource.to_sym].push( info )
     end
+
 
     ##
     # Extract resource name from url

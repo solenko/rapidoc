@@ -14,11 +14,22 @@ module Rapidoc
   class ControllerExtractor
 
     def initialize( controller_file )
-      lines = IO.readlines( controller_dir( controller_file ) )
-      blocks = extract_blocks( lines )
+      @docs_extracted = false
+      @controller_file = controller_file
+    end
 
-      @resource_info = YamlParser.extract_resource_info( lines, blocks, controller_file )
-      @actions_info = YamlParser.extract_actions_info( lines, blocks, controller_file )
+    def docs_extracted?
+      @docs_extracted
+    end
+
+    def description
+      extract_docs! unless docs_extracted?
+      @resource_info["description"]
+    end
+
+    def actions
+      extract_docs! unless docs_extracted?
+      @actions_info
     end
 
     def get_actions_info
@@ -38,6 +49,14 @@ module Rapidoc
     end
 
     private
+
+    def extract_docs!
+      lines = IO.readlines( @controller_file )
+      blocks = extract_blocks( lines )
+      @resource_info = YamlParser.extract_resource_info( lines, blocks, @controller_file )
+      @actions_info = YamlParser.extract_actions_info( lines, blocks, @controller_file )
+      @docs_extracted = true
+    end
 
     ##
     # Gets init and end lines of each comment block

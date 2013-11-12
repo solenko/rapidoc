@@ -16,12 +16,15 @@ module Rapidoc
     # @return [RoutesDoc] class with routes info
     #
     def get_routes_doc
-      puts "Executing 'rake routes'..." if trace?
-
       routes_doc = RoutesDoc.new
-      routes = Dir.chdir( ::Rails.root.to_s ) { `rake routes` }
 
-      routes.split("\n").each do |entry|
+      routes = Rails.application.routes.routes.collect do |route|
+        ActionDispatch::Routing::RouteWrapper.new(route)
+      end.reject do |route|
+        route.internal?
+      end
+
+      routes.each do |entry|
         routes_doc.add_route( entry )
       end
 

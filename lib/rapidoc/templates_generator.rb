@@ -53,7 +53,10 @@ module Rapidoc
 
     def create_action_template( template, action_doc )
       result = template.call( :info => rapidoc_config, :action => action_doc )
-      File.open( actions_dir("#{action_doc.file}.html"), 'w' ) { |file| file.write result }
+      filename = actions_dir("#{action_doc.file}.html")
+      dir_name = File.dirname(filename)
+      FileUtils.mkdir_p dir_name unless File.directory?(dir_name)
+      File.open( filename, 'w' ) { |file| file.write result }
     end
 
     def get_action_template
