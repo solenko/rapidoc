@@ -6,22 +6,10 @@ module Rapidoc
   module TemplatesGenerator
 
     def generate_index_template( resources_doc )
-      template = get_index_template
-      result = template.call( :info => rapidoc_config, :resources => resources_doc )
-
-      File.open( target_dir("index.html"), 'w' ) { |file| file.write result }
+      template = Template.new(gem_templates_dir('index.html.erb'), :info => OpenStruct.new(rapidoc_config), :resources => resources_doc)
+      File.open( target_dir("index.html"), 'w' ) { |file| file.write template.result }
     end
 
-    def get_index_template
-      template = IO.read( gem_templates_dir('index.html.hbs') )
-      handlebars = Handlebars::Context.new
-
-      handlebars.register_helper('method_label') do |this, context, block|
-        get_method_label( block.fn(context) )
-      end
-
-      handlebars.compile( template )
-    end
 
     # Get bootstrap label for a method
     def get_method_label( method )
@@ -63,6 +51,32 @@ module Rapidoc
       template = IO.read( gem_templates_dir('action.html.hbs') )
       handlebars = Handlebars::Context.new
       handlebars.compile( template )
+    end
+  end
+
+  class Template
+    include Rapidoc::Helpers
+
+    def initialize(file_name, bindings = {})
+      @file_name = file_name
+      bindings.each_pair do |key,value|
+        singleton_class.send(:define_method, key) { value }
+      end
+    end
+
+    def result
+      template.result(get_binding)
+    end
+
+    private
+
+    def get_binding
+      binding
+    end
+
+    def template
+
+      erb = ERB.new(IO.read(@file_name))
     end
   end
 end

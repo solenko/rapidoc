@@ -19,6 +19,7 @@ module Rapidoc
           regexp: route.json_regexp,
           controller: route.controller,
           action: route.action
+
       }
       add_resource_route( info[:controller].classify, info)
     end
@@ -47,8 +48,8 @@ module Rapidoc
       return {
         resource: resource.to_s,
         action: action.to_s,
-        method: action_route[:method],
-        urls: action_route[:url],
+        method: action_route[:verb],
+        urls: [action_route[:path]],
         controller: action_route[:controller]
       }
     end

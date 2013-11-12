@@ -33,6 +33,7 @@ module Rapidoc
     end
 
     def get_actions_info
+      puts @actions_info.inspect
       @actions_info
     end
 

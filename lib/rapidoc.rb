@@ -8,8 +8,10 @@ require "rapidoc/action_doc"
 require "rapidoc/controller_extractor"
 require "rapidoc/resources_extractor"
 require "rapidoc/param_errors"
+require "rapidoc/helpers"
 require "rapidoc/templates_generator"
 require "rapidoc/yaml_parser"
+
 
 module Rapidoc
 
