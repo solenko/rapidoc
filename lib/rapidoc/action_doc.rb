@@ -24,11 +24,12 @@ module Rapidoc
       @action_method    = routes_info[:method].to_s || '-----'
       @urls             = routes_info[:urls]
       @file             = @resource + '_' + @action
+      @examples_route   = examples_route
 
       puts " - Generating #{@action} action documentation..." if trace?
 
       add_controller_info( controller_info ) if controller_info
-      load_examples( examples_route ) if examples_route
+      load_examples
       load_params_errors if default_errors? @action and @params
     end
 
@@ -37,6 +38,10 @@ module Rapidoc
     end
 
     private
+
+    def examples_path
+      Rails.root.join(@examples_route, resource)
+    end
 
     def add_controller_info( controller_info )
       puts "  + Adding info from controller..." if trace?
@@ -61,10 +66,10 @@ module Rapidoc
       codes.map{ |c| HttpResponse.new c } if codes
     end
 
-    def load_examples( examples_route )
-      return unless File.directory? examples_route + "/"
-      load_request examples_route
-      load_response examples_route
+    def load_examples
+      return unless File.directory?(examples_path)
+      load_request examples_path
+      load_response examples_path
     end
 
     def load_params_errors
@@ -75,14 +80,14 @@ module Rapidoc
     end
 
     def load_request( examples_route )
-      file = examples_route + '/' + @resource + '_' + @action + '_request.json'
+      file = File.join(examples_route, action + '_request.json')
       return unless File.exists?( file )
       puts "  + Loading request examples..." if trace?
       File.open( file ){ |f| @example_req = JSON.pretty_generate( JSON.parse(f.read) ) }
     end
 
     def load_response( examples_route )
-      file = examples_route + '/' + @resource + '_' + @action + '_response.json'
+      file = File.join(examples_route, action + '_response.json')
       return unless File.exists?( file )
       puts "  + Loading response examples..." if trace?
       File.open( file ){ |f| @example_res = JSON.pretty_generate( JSON.parse(f.read) ) }
