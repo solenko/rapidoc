@@ -39,11 +39,13 @@ module Rapidoc
     # Create description and actions_doc
     #
     def generate_info( routes_info )
-      routes_info.map {|i| i[:controller]}.uniq.each do |controller_name|
+      routes_info.map {|i| i[:controller]}.compact.uniq.each do |controller_name|
+        next unless controller_exists?(controller_name)
         @description << controller_extractor(controller_name).description
       end
 
       routes_info.each do |route|
+        next unless controller_exists?(route[:controller])
         @actions_doc << get_action_doc( route, controller_extractor(route[:controller]) )
       end
     end
@@ -54,6 +56,10 @@ module Rapidoc
     #
     def controller_extractor(controller)
       @extractors[controller] ||= ControllerExtractor.new(controller_file_name(controller))
+    end
+
+    def controller_exists?(controller_name)
+      controller_file_name(controller_name)
     end
 
     ##

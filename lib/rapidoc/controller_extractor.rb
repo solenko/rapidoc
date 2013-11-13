@@ -33,7 +33,6 @@ module Rapidoc
     end
 
     def get_actions_info
-      puts @actions_info.inspect
       @actions_info
     end
 
@@ -52,10 +51,12 @@ module Rapidoc
     private
 
     def extract_docs!
-      lines = IO.readlines( @controller_file )
-      blocks = extract_blocks( lines )
-      @resource_info = YamlParser.extract_resource_info( lines, blocks, @controller_file )
-      @actions_info = YamlParser.extract_actions_info( lines, blocks, @controller_file )
+      if File.exists? @controller_file
+        lines = IO.readlines( @controller_file )
+        blocks = extract_blocks( lines )
+        @resource_info = YamlParser.extract_resource_info( lines, blocks, @controller_file )
+        @actions_info = YamlParser.extract_actions_info( lines, blocks, @controller_file )
+      end
       @docs_extracted = true
     end
 

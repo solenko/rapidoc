@@ -1,3 +1,5 @@
+require 'vendor/action_dispatch/routing/inspector' if ActiveSupport::VERSION::MAJOR < 4
+
 module Rapidoc
 
   ##
