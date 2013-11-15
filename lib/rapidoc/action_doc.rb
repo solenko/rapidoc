@@ -40,7 +40,7 @@ module Rapidoc
     private
 
     def examples_path
-      Rails.root.join(@examples_route, resource)
+      Rails.root.join(@examples_route, resource.downcase)
     end
 
     def add_controller_info( controller_info )
@@ -90,7 +90,13 @@ module Rapidoc
       file = File.join(examples_route, action + '_response.json')
       return unless File.exists?( file )
       puts "  + Loading response examples..." if trace?
-      File.open( file ){ |f| @example_res = JSON.pretty_generate( JSON.parse(f.read) ) }
+
+      begin
+        File.open( file ){ |f| @example_res = JSON.pretty_generate( JSON.parse(f.read) ) }
+      rescue JSON::ParserError => e
+        @example_res = File.read file
+      end
+
     end
   end
 end
