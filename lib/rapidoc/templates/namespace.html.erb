@@ -1,0 +1,17 @@
+<div class="accordion-inner">
+  <div class="accordion" id="namespace_<%= namespace.simple_name %>">
+    <% namespace.children.each do |child| %>
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#namespace_<%= namespace.simple_name %>" href="#collapse<%= child.simple_name%>">
+            <strong><%= child.name %></strong>
+          </a>
+        </div>
+        <div id="collapse<%= child.simple_name%>" class="accordion-body collapse">
+          <%= child.html %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+

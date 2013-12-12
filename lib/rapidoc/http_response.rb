@@ -8,16 +8,16 @@ module Rapidoc
   #
   class HttpResponse
 
-    attr_reader :code, :description, :label
+    attr_reader :code, :description, :label, :documentation
 
     def initialize( code )
-      @code = code
+      @code, @documentation = code.split(' ', 2)
       @description = get_description
       @label = get_label
     end
 
     def get_description
-      case @code
+      case @code.to_i
         when 200
           'OK'
         when 201
@@ -38,7 +38,7 @@ module Rapidoc
     end
 
     def get_label
-      case @code
+      case @code.to_i
         when 200
           'label label-info'
         when 201

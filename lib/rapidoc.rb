@@ -1,5 +1,8 @@
 require 'handlebars'
 require "rapidoc/config"
+require "rapidoc/resource_container"
+require "rapidoc/application_doc"
+require "rapidoc/namespace_doc"
 require "rapidoc/version"
 require "tasks/railtie.rb"
 require "rapidoc/routes_doc"
@@ -55,10 +58,22 @@ module Rapidoc
   end
 
   def generate_doc
-    resources_doc = get_resources
+    doc = ApplicationDoc.new
 
-    generate_index_template( resources_doc )
-    generate_actions_templates( resources_doc )
+    routes_list.each do |route|
+      doc.add_route(route)
+    end
+
+    generate_index_template( doc )
+    generate_actions_templates( doc )
+  end
+
+  def routes_list
+    Rails.application.routes.routes.collect do |route|
+      ActionDispatch::Routing::RouteWrapper.new(route)
+    end.reject do |route|
+      route.internal?
+    end
   end
 
 end

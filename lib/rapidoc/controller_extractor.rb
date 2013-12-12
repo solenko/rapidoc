@@ -13,23 +13,27 @@ module Rapidoc
   #
   class ControllerExtractor
 
-    def initialize( controller_file )
-      @docs_extracted = false
-      @controller_file = controller_file
+    @@instances = {}
+
+    def self.instance(controller_filename)
+      @@instances[controller_filename] ||= new(controller_filename)
     end
 
-    def docs_extracted?
-      @docs_extracted
+    def initialize( controller_file )
+      @controller_file = controller_file
+      extract_docs!
     end
 
     def description
-      extract_docs! unless docs_extracted?
       @resource_info["description"]
     end
 
     def actions
-      extract_docs! unless docs_extracted?
       @actions_info
+    end
+
+    def action(name)
+      get_action_info( name )
     end
 
     def get_actions_info
@@ -57,7 +61,6 @@ module Rapidoc
         @resource_info = YamlParser.extract_resource_info( lines, blocks, @controller_file )
         @actions_info = YamlParser.extract_actions_info( lines, blocks, @controller_file )
       end
-      @docs_extracted = true
     end
 
     ##

@@ -41,37 +41,15 @@
       </div>
       <div class="accordion" id="accordion2">
 
-      <% resources.each do |resource| %>
+      <% application_doc.children.each do |child| %>
         <div class="accordion-group">
           <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse<%= resource.simple_name%>">
-              <strong><%= resource.name %></strong>
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse<%= child.simple_name%>">
+              <strong><%= child.name %></strong>
             </a>
           </div>
-          <div id="collapse<%= resource.simple_name%>" class="accordion-body collapse">
-            <div class="accordion-inner">
-              <div class="pad-description">
-                <% resource.description.each do |section| %>
-                  <p><%= section %></p>
-                <% end %>
-              </div>
-              <table class="table table-hover">
-                <% resource.actions_doc.each do |action| %>
-                  <tr>
-                    <td class="routes">
-                      <span class="<%= method_class(action.action_method) %>"><%= action.action_method %></span>
-                    </td>
-                    <td>
-                      <% if action.has_controller_info %>
-                        <a href="actions/<%=resource.name %>_<%= action.action %>.html"><%= action.action %><a>
-                      <% else %>
-                        <%= action.action %>
-                      <% end %>
-                    </td>
-                  </tr>
-                <% end %>
-              </table>
-            </div>
+          <div id="collapse<%= child.simple_name%>" class="accordion-body collapse">
+            <%= child.html %>
           </div>
         </div>
       <% end %>

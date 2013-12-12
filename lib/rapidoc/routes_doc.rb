@@ -60,8 +60,19 @@ module Rapidoc
     # Add new route info to resource routes array with correct format
     #
     def add_resource_route( resource, info)
-      @resources_routes[resource.to_sym] ||= []
-      @resources_routes[resource.to_sym].push( info )
+
+      namespaces = resource.split('::')
+      resource_name = namespaces.pop
+      h = @resources_routes
+      namespaces.each do |namespace|
+        h[namespace] ||= {}
+        h = h[namespace]
+      end
+      h[resource_name] ||= []
+      h[resource_name].push(info)
+
+#      @resources_routes[resource.to_sym] ||= []
+#      @resources_routes[resource.to_sym].push( info )
     end
 
 

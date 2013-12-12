@@ -8,26 +8,48 @@ module Rapidoc
   # It includes an array of ActionDoc with each action information
   #
   class ResourceDoc
-    attr_reader :name, :description, :controller_file, :actions_doc
+    attr_reader :name, :controller_file, :actions_doc
+
+    attr_reader :actions, :extractor
+
+    delegate :description, :to => :extractor
 
     ##
-    # @param resource_name [String] resource name
+    # @param name [String] resource name
     # @param routes_doc [RoutesDoc] routes documentation
     #
-    def initialize( resource_name, routes_actions_info )
-      @name = resource_name.to_s
-      @actions_doc = []
-      @description = []
-      @extractors = {}
-      generate_info routes_actions_info
+    def initialize(name, route, parent)
+      @name = name
+      @route = route
+      @controller = route.controller
+      @parent = parent
+
+      @actions = []
+
+      @extractor = ControllerExtractor.instance(controller_file_name(@controller))
+    end
+
+    def add_action(name, route)
+      @actions.push(ActionDoc.new(name, route, @extractor.action(name), self))
+    end
+
+    def html
+      template = Template.new('resource.html.erb', :resource => self)
+      template.result
     end
 
     ##
     # Names with '/' caracter produce problems in html ids
     #
     def simple_name
-      self.name.parameterize
+      [@parent.simple_name, self.name.parameterize].compact.join('_')
     end
+
+    def parents
+      @parent.parents + [@parent]
+    end
+
+
 
     private
 

@@ -5,9 +5,8 @@ module Rapidoc
   #
   module TemplatesGenerator
 
-    def generate_index_template( resources_doc )
-      template = Template.new(gem_templates_dir('index.html.erb'), :info => OpenStruct.new(rapidoc_config), :resources => resources_doc)
-      File.open( target_dir("index.html"), 'w' ) { |file| file.write template.result }
+    def generate_index_template( application_doc )
+      File.open( target_dir("index.html"), 'w' ) { |file| file.write application_doc.html }
     end
 
 
@@ -27,7 +26,13 @@ module Rapidoc
       end
     end
 
-    def generate_actions_templates( resources_doc )
+    def generate_actions_templates( application_doc )
+      dir_name = actions_dir
+      FileUtils.mkdir_p dir_name unless File.directory?(dir_name)
+      application_doc.actions.each do |action|
+        File.open( actions_dir("#{action.file_name}.html"), 'w' ) { |file| file.write action.html }
+      end
+      return
       resources_doc.each do |resource|
         if resource.actions_doc
           resource.actions_doc.each do |action_doc|
@@ -58,7 +63,7 @@ module Rapidoc
     include Rapidoc::Helpers
 
     def initialize(file_name, bindings = {})
-      @file_name = file_name
+      @file_name = gem_templates_dir(file_name)
       bindings.each_pair do |key,value|
         singleton_class.send(:define_method, key) { value }
       end

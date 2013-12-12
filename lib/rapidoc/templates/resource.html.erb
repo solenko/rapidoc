@@ -1,0 +1,24 @@
+<div class="accordion-inner">
+  <div class="pad-description">
+    <p><%= resource.description %></p>
+  </div>
+  <table class="table table-hover">
+    <% resource.actions.each do |action| %>
+      <tr>
+        <td class="routes">
+          <span class="<%= method_class(action.verb) %>"><%= action.verb %></span>
+        </td>
+        <td>
+          <% if action.doc.present? %>
+            <a href="actions/<%=action.file_name %>.html"><%= action.name %><a>
+          <% else %>
+            <%= action.name %>
+          <% end %>
+        </td>
+        <td>
+          <code><%= action.path %></code>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+</div>

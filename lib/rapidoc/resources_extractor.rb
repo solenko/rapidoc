@@ -18,7 +18,7 @@ module Rapidoc
     # @return [RoutesDoc] class with routes info
     #
     def get_routes_doc
-      routes_doc = RoutesDoc.new
+      routes_doc = ApplicationDoc.new
 
       routes = Rails.application.routes.routes.collect do |route|
         ActionDispatch::Routing::RouteWrapper.new(route)
