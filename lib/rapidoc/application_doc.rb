@@ -2,6 +2,7 @@ module Rapidoc
   class ApplicationDoc < ResourceContainer
 
     def add_route(route)
+      return if route.verb.to_s == 'PATCH'
       namespaces = route.controller.classify.split('::')
       resource_name = namespaces.pop
       namespace = self

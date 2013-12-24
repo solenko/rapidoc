@@ -55,7 +55,7 @@ module Rapidoc
     private
 
     def extract_docs!
-      if File.exists? @controller_file
+      if File.exists?(@controller_file)
         lines = IO.readlines( @controller_file )
         blocks = extract_blocks( lines )
         @resource_info = YamlParser.extract_resource_info( lines, blocks, @controller_file )

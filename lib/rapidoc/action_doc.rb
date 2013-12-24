@@ -53,7 +53,7 @@ module Rapidoc
     end
 
     def description
-      doc['description']
+      Array(doc['description']).join('<br />')
     end
 
     def response_formats
@@ -129,9 +129,6 @@ module Rapidoc
 
     def load_request( examples_route )
       file = File.join(examples_route, name + '_request.json')
-      puts "request"
-      puts examples_route
-      puts file
       return unless File.exists?( file )
       puts "  + Loading request examples..." if trace?
       File.open( file ){ |f| @example_req = JSON.pretty_generate( JSON.parse(f.read) ) }
